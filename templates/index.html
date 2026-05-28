@@ -1,1 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Breathing Monitor</title>
 
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        #bpm {
+            font-size: 50px;
+            text-align: center;
+            color: #38bdf8;
+        }
+
+        #status {
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .item {
+            background: #334155;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Breathing Monitor Dashboard</h1>
+
+    <div class="card">
+        <h2>Live Reading</h2>
+        <div id="bpm">-- BPM</div>
+        <div id="status">Waiting...</div>
+    </div>
+
+    <div class="card">
+        <h2>History</h2>
+        <div id="history"></div>
+    </div>
+
+</div>
+
+<script>
+
+async function loadData() {
+
+    const res = await fetch("/api/data");
+    const data = await res.json();
+
+    if (data.length > 0) {
+
+        const latest = data[0];
+
+        document.getElementById("bpm").innerText =
+            latest.breathingRate + " BPM";
+
+        document.getElementById("status").innerText =
+            latest.status;
+
+        let html = "";
+
+        data.forEach(d => {
+            html += `
+                <div class="item">
+                    ${d.breathingRate} BPM - ${d.status}<br>
+                    <small>${d.time}</small>
+                </div>
+            `;
+        });
+
+        document.getElementById("history").innerHTML = html;
+    }
+}
+
+loadData();
+setInterval(loadData, 3000);
+
+</script>
+
+</body>
+</html>
